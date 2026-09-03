@@ -45,6 +45,12 @@ jobs:
           TECHNAR_TOKEN: ${{ secrets.TECHNAR_TOKEN }}
           # Comma-separated explicit recipients for the routed message.
           TECHNAR_USERNAMES: ${{ secrets.TECHNAR_USERNAMES }}
+          # Custom PAT for fetch_trending.py. Repo secrets can't be named
+          # GITHUB_* (reserved), so we map via the env var GH_TOKEN which
+          # fetch_trending.py reads with priority over the runner-provided
+          # GITHUB_TOKEN (so a higher-rate-limit PAT actually wins).
+          # Leave unset to fall back to the runner-provided GITHUB_TOKEN.
+          GH_TOKEN: ${{ secrets.HORIZON_GH_TOKEN }}
         run: uv run mobile_digest
 
       - name: Set current date as environment variable

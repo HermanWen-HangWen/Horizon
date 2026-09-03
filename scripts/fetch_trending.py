@@ -158,9 +158,17 @@ def count_stars_today(client: httpx.Client, headers: dict, full_name: str) -> tu
 
 def main() -> int:
     args = parse_args()
-    token = os.getenv("GITHUB_TOKEN")
+    # Prefer GH_TOKEN (user-supplied PAT via repo secret HORIZON_GH_TOKEN,
+    # mapped in the workflow) so callers can override the low-rate-limit
+    # runner-provided token. Fall back to GITHUB_TOKEN which works for
+    # local .env setups and as a last-resort CI default.
+    token = os.getenv("GH_TOKEN") or os.getenv("GITHUB_TOKEN")
     if not token:
-        print("❌ [Github Trending] GITHUB_TOKEN not set in env (.env loaded?).", file=sys.stderr)
+        print(
+            "❌ [Github Trending] Neither GH_TOKEN nor GITHUB_TOKEN set in env "
+            "(.env loaded? GH_TOKEN workflow secret configured?).",
+            file=sys.stderr,
+        )
         return 1
 
     headers = {
