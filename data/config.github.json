@@ -328,6 +328,60 @@
         "category": "",
         "content_extractor": null,
         "profile": null
+      },
+      {
+        "name": "GitHub Trending — All (daily)",
+        "url": "https://mshibanami.github.io/GitHubTrendingRSS/daily/all.xml",
+        "enabled": true,
+        "category": "github-trending",
+        "content_extractor": null,
+        "profile": "tech-news",
+        "daily_rollup": true
+      },
+      {
+        "name": "GitHub Trending — Python (daily)",
+        "url": "https://mshibanami.github.io/GitHubTrendingRSS/daily/python.xml",
+        "enabled": true,
+        "category": "github-trending",
+        "content_extractor": null,
+        "profile": "tech-news",
+        "daily_rollup": true
+      },
+      {
+        "name": "GitHub Trending — TypeScript (daily)",
+        "url": "https://mshibanami.github.io/GitHubTrendingRSS/daily/typescript.xml",
+        "enabled": true,
+        "category": "github-trending",
+        "content_extractor": null,
+        "profile": "tech-news",
+        "daily_rollup": true
+      },
+      {
+        "name": "arXiv cs.AI",
+        "url": "https://export.arxiv.org/rss/cs.AI",
+        "enabled": true,
+        "category": "ai-research",
+        "content_extractor": null,
+        "profile": "tech-news",
+        "max_items": 15
+      },
+      {
+        "name": "arXiv cs.LG",
+        "url": "https://export.arxiv.org/rss/cs.LG",
+        "enabled": true,
+        "category": "ai-research",
+        "content_extractor": null,
+        "profile": "tech-news",
+        "max_items": 15
+      },
+      {
+        "name": "arXiv cs.CL",
+        "url": "https://export.arxiv.org/rss/cs.CL",
+        "enabled": true,
+        "category": "ai-research",
+        "content_extractor": null,
+        "profile": "tech-news",
+        "max_items": 15
       }
     ],
     "reddit": {
@@ -563,7 +617,7 @@
     "sender_name": "Horizon Daily",
     "subscribe_keyword": "SUBSCRIBE",
     "unsubscribe_keyword": "UNSUBSCRIBE",
-    "enabled": true
+    "enabled": false
   },
   "webhook": {
     "url_env": "HORIZON_WEBHOOK_URL",
