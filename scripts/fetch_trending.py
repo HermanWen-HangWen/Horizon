@@ -95,6 +95,8 @@ def enrich_repo_stats(client: httpx.Client, headers: dict, repo: dict) -> bool:
     """Fetch total_stars, description, language via /repos/{owner}/{repo}.
 
     Mutates `repo` in place. Returns True on success, False on HTTP failure.
+    On failure, sets sentinel values (None for stats, "" / [] for strings/lists)
+    so the JSON schema stays uniform and the digest can detect missing data.
     """
     url = f"https://api.github.com/repos/{repo['full_name']}"
     try:
@@ -102,6 +104,13 @@ def enrich_repo_stats(client: httpx.Client, headers: dict, repo: dict) -> bool:
         resp.raise_for_status()
     except httpx.HTTPError as e:
         print(_http_err(f"stats {repo['full_name']}", url, e), file=sys.stderr)
+        repo["total_stars"] = None
+        repo["description"] = ""
+        repo["primary_language"] = None
+        repo["forks"] = 0
+        repo["created_at"] = ""
+        repo["pushed_at"] = ""
+        repo["topics"] = []
         return False
 
     data = resp.json()
@@ -188,13 +197,11 @@ def main() -> int:
         if all_results:
             print(f"[Github Trending] ⭐ Counting 24h stars…", file=sys.stderr)
             for r in all_results:
-                _, ok = count_stars_today(client, headers, r["full_name"])
-                # Always set stars_today so JSON schema stays uniform.
-                r.setdefault("stars_today", 0)
+                today, ok = count_stars_today(client, headers, r["full_name"])
                 if ok:
+                    r["stars_today"] = today
                     events_ok += 1
-                else:
-                    r["stars_today"] = 0
+                # On failure: leave stars_today unset so digest shows "?"
 
     payload = {
         "generated_at": datetime.now(timezone.utc).isoformat(),

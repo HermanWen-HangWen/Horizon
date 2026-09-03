@@ -63,8 +63,11 @@ SYSTEM_PROMPT = """\
 
 8. **GitHub Trending 段:从 user prompt 末尾的"Trending 真实数据"段里,过滤出 AI 相关的 repo,选 Top 3**
    - 过滤标准:描述/名称包含 LLM、agent、model、训练、推理、embedding、向量、prompt、RAG、Claude、GPT、Qwen、Llama、Mistral、diffusion 等 AI 关键词,或主语言是 Python 且与 AI 生态相关
-   - 排序:**按 stars_today 倒序**(用户想看"今天涨最快的 AI repo",不是总 star 最多的)
-   - 数据严格使用该段提供的 total_stars 和 stars_today
+   - 排序:**优先按 stars_today 倒序**(用户想看"今天涨最快的 AI repo",不是总 star 最多的)
+   - **若 stars_today 显示为 `?`(抓取失败),fallback 到 total_stars 倒序**
+   - **若 total_stars 也显示为 `?`(stats API 也失败),输出格式省略 star 字段:`<repo> — <语言> — <一句话> [详情](<URL>)`**
+   - **即使只有 repo 名字(没有任何 star 数据),也要生成这条段,不要因为缺数据整段跳过**
+   - 数据严格使用该段提供的 total_stars 和 stars_today(没有就标 `?` 或省略)
    - 若过滤后少于 3 条 AI repo,有多少写多少,不要凑数
    - 链接同样用 `[详情](https://github.com/owner/repo)` 格式
 
@@ -210,12 +213,19 @@ def load_trending_block() -> str:
     lines.append(
         "每条格式:rank · full_name · primary_language · total_stars · stars_today(24h) · description"
     )
+    lines.append(
+        "注:`?` 表示抓取失败(API 限流/网络问题);`Unknown` 表示 GitHub 未返回语言字段。"
+    )
     lines.append("")
     for r in repos:
         desc = (r.get("description") or "(无描述)").replace("\n", " ").strip()
-        today = r.get("stars_today", 0)
+        total = r.get("total_stars")
+        total_str = f"⭐{total}" if total is not None else "⭐?"
+        today = r.get("stars_today")
+        today_str = f"+{today} today" if today is not None else "+? today"
+        lang = r.get("primary_language") or "?"
         lines.append(
-            f"#{r['rank']} [{r['language']}] {r['full_name']} | {r['primary_language']} | ⭐{r['total_stars']} | +{today} today | {desc} | {r['url']}"
+            f"#{r['rank']} [{r['language']}] {r['full_name']} | {lang} | {total_str} | {today_str} | {desc} | {r['url']}"
         )
     lines.append("========== Trending 数据结束 ==========")
     return "\n".join(lines)
