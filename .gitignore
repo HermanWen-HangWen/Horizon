@@ -61,4 +61,7 @@ logs/*.log
 # todo
 todo.txt
 .ruff_cache
-.pytest_cachedata/trending.json
+.pytest_cache
+
+# Generated trending data
+data/trending.json
