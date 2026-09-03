@@ -88,8 +88,10 @@ class RSSScraper(BaseScraper):
             feed = feedparser.parse(response.text)
 
             for entry in feed.entries:
-                # Parse published date
-                published_at = self._parse_date(entry)
+                # Parse published date. For feeds flagged as daily_rollup
+                # (e.g. mshibanami/GitHubTrendingRSS), fall back to the
+                # channel-level pubDate when items lack their own.
+                published_at = self._parse_date(entry, feed, use_channel_fallback=source.daily_rollup)
                 if not published_at or published_at < since:
                     continue
 
@@ -136,29 +138,44 @@ class RSSScraper(BaseScraper):
 
         return items
 
-    def _parse_date(self, entry: dict) -> datetime:
+    def _parse_date(self, entry: dict, feed=None, use_channel_fallback: bool = False) -> Optional[datetime]:
         """Parse publication date from feed entry.
 
         Args:
             entry: Feed entry data
+            feed: Optional parent feed
+            use_channel_fallback: If True (and entry has no per-item date),
+                fall back to the channel-level pubDate. Intended for
+                daily-rollup feeds where individual items lack their own.
 
         Returns:
             datetime: Parsed publication date or None
         """
-        # Try different date fields
+        # Try different date fields on the entry
         for field in ["published", "updated", "created"]:
             if field in entry:
                 try:
-                    # Try parsing structured time first
                     if f"{field}_parsed" in entry and entry[f"{field}_parsed"]:
                         return datetime.fromtimestamp(
                             calendar.timegm(entry[f"{field}_parsed"]), tz=timezone.utc
                         )
-                    # Fallback to string parsing
                     date_str = entry[field]
                     return parsedate_to_datetime(date_str)
                 except Exception:
                     continue
+
+        # Optional fallback to channel-level pubDate (opt-in via daily_rollup)
+        if use_channel_fallback and feed is not None:
+            channel_dt = getattr(feed.feed, "published_parsed", None) or getattr(
+                feed.feed, "updated_parsed", None
+            )
+            if channel_dt:
+                try:
+                    return datetime.fromtimestamp(
+                        calendar.timegm(channel_dt), tz=timezone.utc
+                    )
+                except Exception:
+                    pass
 
         return None
 

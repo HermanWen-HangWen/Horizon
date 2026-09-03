@@ -260,6 +260,11 @@ class RSSSourceConfig(BaseModel):
     category: Optional[str] = None
     content_extractor: Optional[str] = None
     profile: ProfileRoute = None
+    daily_rollup: bool = False  # If true, fall back to channel-level pubDate
+                                # when items lack their own (e.g. mshibanami/
+                                # GitHubTrendingRSS). Off by default to avoid
+                                # flooding with stale items from feeds that
+                                # don't expose per-item dates.
 
 
 class RedditSubredditConfig(BaseModel):
