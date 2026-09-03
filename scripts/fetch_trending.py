@@ -78,6 +78,36 @@ def fetch_category(client: httpx.Client, headers: dict, days: int, min_stars: in
     return results
 
 
+def count_stars_today(client: httpx.Client, headers: dict, full_name: str) -> int:
+    """Count WatchEvents (stars) in last 24h via the Events API.
+
+    Uses /repos/{owner}/{repo}/events which doesn't require the special
+    `star+json` accept header (works with default OAuth scopes). Returns
+    0 on failure. Capped at 1 page since GitHub events endpoint serves
+    the 300 most recent events and WatchEvents dominate for trending repos.
+    """
+    url = f"https://api.github.com/repos/{full_name}/events?per_page=100"
+    try:
+        resp = client.get(url, headers=headers, timeout=30.0)
+        resp.raise_for_status()
+    except httpx.HTTPError as e:
+        print(f"   ⚠️  events for {full_name}: {e}", file=sys.stderr)
+        return 0
+
+    cutoff = datetime.now(timezone.utc) - timedelta(hours=24)
+    count = 0
+    for event in resp.json():
+        if event.get("type") != "WatchEvent":
+            continue
+        try:
+            ts = datetime.fromisoformat(event["created_at"].replace("Z", "+00:00"))
+            if ts > cutoff:
+                count += 1
+        except (KeyError, ValueError):
+            continue
+    return count
+
+
 def main() -> int:
     args = parse_args()
     token = os.getenv("GITHUB_TOKEN")
@@ -103,6 +133,12 @@ def main() -> int:
             )
             print(f"   → {len(items)} repos", file=sys.stderr)
             all_results.extend(items)
+
+        # Enrich with stars_today via the Events API (one extra call per repo).
+        if all_results:
+            print(f"⭐ Counting 24h stars for {len(all_results)} repos…", file=sys.stderr)
+            for r in all_results:
+                r["stars_today"] = count_stars_today(client, headers, r["full_name"])
 
     payload = {
         "generated_at": datetime.now(timezone.utc).isoformat(),

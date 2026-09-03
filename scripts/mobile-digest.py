@@ -167,18 +167,19 @@ def load_trending_block() -> str:
     if not repos:
         return ""
 
-    lines = ["========== Trending 真实数据 (GitHub Search API) =========="]
+    lines = ["========== Trending 真实数据 (GitHub Search + Events API) =========="]
     lines.append(
         f"窗口:最近 {payload.get('window_days', '?')} 天 · 最低 star: {payload.get('min_stars', '?')} · 生成时间: {payload.get('generated_at', '?')}"
     )
     lines.append(
-        "每条格式:rank · full_name · primary_language · total_stars · description"
+        "每条格式:rank · full_name · primary_language · total_stars · stars_today(24h) · description"
     )
     lines.append("")
     for r in repos:
         desc = (r.get("description") or "(无描述)").replace("\n", " ").strip()
+        today = r.get("stars_today", 0)
         lines.append(
-            f"#{r['rank']} [{r['language']}] {r['full_name']} | {r['primary_language']} | ⭐{r['total_stars']} | {desc} | {r['url']}"
+            f"#{r['rank']} [{r['language']}] {r['full_name']} | {r['primary_language']} | ⭐{r['total_stars']} | +{today} today | {desc} | {r['url']}"
         )
     lines.append("========== Trending 数据结束 ==========")
     return "\n".join(lines)
