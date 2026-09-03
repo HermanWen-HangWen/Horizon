@@ -10,7 +10,7 @@ on:
 
 jobs:
   mobile-digest:
-    runs-on: cloudgcitk8srunner
+    runs-on: ${{ vars.RUNNER_JSON && fromJSON(vars.RUNNER_JSON) || 'ubuntu-latest' }}
     permissions:
       contents: write  # Needed for the gh-pages deploy step
     env:
