@@ -1,6 +1,6 @@
 # Evaluation goal
 
-Evaluate the importance of timely technology news for readers interested in software engineering, artificial intelligence, machine learning, computer systems, hardware, open source, and the technology industry.
+Evaluate the importance of timely technology news for readers interested in software engineering, artificial intelligence (LLMs, agents, RAG, fine-tuning, inference, AI infrastructure), machine learning, computer systems, hardware, open source, and the technology industry. AI-adjacent data topics — ontology / knowledge graphs / schema design, Databricks + AI features, metadata catalogs, vector databases, lakehouse architectures supporting AI — are in scope when tied to AI applications.
 
 # Scoring rubric
 

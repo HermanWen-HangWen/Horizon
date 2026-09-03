@@ -87,7 +87,9 @@
         "enabled": true,
         "category": "ai-tools",
         "content_extractor": null,
-        "profile": "tech-news"
+        "profile": "tech-news",
+        "max_items": null,
+        "daily_rollup": false
       },
       {
         "name": "vLLM Blog",
@@ -95,7 +97,9 @@
         "enabled": true,
         "category": "llm-inference",
         "content_extractor": "trafilatura",
-        "profile": "tech-blog"
+        "profile": "tech-blog",
+        "max_items": null,
+        "daily_rollup": false
       },
       {
         "name": "Sean Goedecke",
@@ -103,7 +107,9 @@
         "enabled": true,
         "category": "software-engineering",
         "content_extractor": "trafilatura",
-        "profile": "tech-blog"
+        "profile": "tech-blog",
+        "max_items": null,
+        "daily_rollup": false
       },
       {
         "name": "CNBC Finance",
@@ -111,7 +117,9 @@
         "enabled": false,
         "category": "finance",
         "content_extractor": "trafilatura",
-        "profile": "finance-news"
+        "profile": "finance-news",
+        "max_items": null,
+        "daily_rollup": false
       },
       {
         "name": "NVIDIA CUDA Technical Blog",
@@ -119,7 +127,29 @@
         "enabled": true,
         "category": "cuda",
         "content_extractor": "trafilatura",
-        "profile": "tech-blog"
+        "profile": "tech-blog",
+        "max_items": null,
+        "daily_rollup": false
+      },
+      {
+        "name": "Databricks Blog",
+        "url": "https://www.databricks.com/rss.xml",
+        "enabled": true,
+        "category": "databricks",
+        "content_extractor": "trafilatura",
+        "profile": "tech-blog",
+        "max_items": null,
+        "daily_rollup": false
+      },
+      {
+        "name": "Stardog Blog",
+        "url": "https://www.stardog.com/index.xml",
+        "enabled": true,
+        "category": "knowledge-graph",
+        "content_extractor": "trafilatura",
+        "profile": "tech-blog",
+        "max_items": null,
+        "daily_rollup": false
       },
       {
         "name": "LWN.net (subscriber full-text)",
@@ -127,7 +157,9 @@
         "enabled": false,
         "category": "linux",
         "content_extractor": null,
-        "profile": "tech-news"
+        "profile": "tech-news",
+        "max_items": null,
+        "daily_rollup": false
       },
       {
         "name": "Anthropic Research",
@@ -135,7 +167,9 @@
         "enabled": true,
         "category": "",
         "content_extractor": null,
-        "profile": null
+        "profile": null,
+        "max_items": null,
+        "daily_rollup": false
       },
       {
         "name": "量子位",
@@ -143,7 +177,9 @@
         "enabled": true,
         "category": "",
         "content_extractor": null,
-        "profile": null
+        "profile": null,
+        "max_items": null,
+        "daily_rollup": false
       },
       {
         "name": "新智元",
@@ -151,7 +187,9 @@
         "enabled": true,
         "category": "",
         "content_extractor": null,
-        "profile": null
+        "profile": null,
+        "max_items": null,
+        "daily_rollup": false
       },
       {
         "name": "BAIR Blog",
@@ -159,7 +197,9 @@
         "enabled": true,
         "category": "",
         "content_extractor": null,
-        "profile": null
+        "profile": null,
+        "max_items": null,
+        "daily_rollup": false
       },
       {
         "name": "Latent Space",
@@ -167,7 +207,9 @@
         "enabled": true,
         "category": "",
         "content_extractor": null,
-        "profile": null
+        "profile": null,
+        "max_items": null,
+        "daily_rollup": false
       },
       {
         "name": "Chip Huyen",
@@ -175,7 +217,9 @@
         "enabled": true,
         "category": "",
         "content_extractor": null,
-        "profile": null
+        "profile": null,
+        "max_items": null,
+        "daily_rollup": false
       },
       {
         "name": "Jay Alammar",
@@ -183,7 +227,9 @@
         "enabled": true,
         "category": "",
         "content_extractor": null,
-        "profile": null
+        "profile": null,
+        "max_items": null,
+        "daily_rollup": false
       },
       {
         "name": "Ahead of AI (Sebastian Raschka)",
@@ -191,7 +237,9 @@
         "enabled": true,
         "category": "",
         "content_extractor": null,
-        "profile": null
+        "profile": null,
+        "max_items": null,
+        "daily_rollup": false
       },
       {
         "name": "Interconnects",
@@ -199,7 +247,9 @@
         "enabled": true,
         "category": "",
         "content_extractor": null,
-        "profile": null
+        "profile": null,
+        "max_items": null,
+        "daily_rollup": false
       },
       {
         "name": "Machine Learning Mastery",
@@ -207,7 +257,9 @@
         "enabled": true,
         "category": "",
         "content_extractor": null,
-        "profile": null
+        "profile": null,
+        "max_items": null,
+        "daily_rollup": false
       },
       {
         "name": "OpenAI Blog",
@@ -215,7 +267,9 @@
         "enabled": true,
         "category": "",
         "content_extractor": null,
-        "profile": null
+        "profile": null,
+        "max_items": null,
+        "daily_rollup": false
       },
       {
         "name": "Sebastian Raschka",
@@ -223,7 +277,9 @@
         "enabled": true,
         "category": "",
         "content_extractor": null,
-        "profile": null
+        "profile": null,
+        "max_items": null,
+        "daily_rollup": false
       },
       {
         "name": "The Batch",
@@ -231,7 +287,9 @@
         "enabled": true,
         "category": "",
         "content_extractor": null,
-        "profile": null
+        "profile": null,
+        "max_items": null,
+        "daily_rollup": false
       },
       {
         "name": "The Gradient",
@@ -239,7 +297,9 @@
         "enabled": true,
         "category": "",
         "content_extractor": null,
-        "profile": null
+        "profile": null,
+        "max_items": null,
+        "daily_rollup": false
       },
       {
         "name": "Stanford AI Lab (SAIL) Blog",
@@ -247,7 +307,9 @@
         "enabled": true,
         "category": "",
         "content_extractor": null,
-        "profile": null
+        "profile": null,
+        "max_items": null,
+        "daily_rollup": false
       },
       {
         "name": "Ars Technica AI",
@@ -255,7 +317,9 @@
         "enabled": true,
         "category": "",
         "content_extractor": null,
-        "profile": null
+        "profile": null,
+        "max_items": null,
+        "daily_rollup": false
       },
       {
         "name": "AI Weekly",
@@ -263,7 +327,9 @@
         "enabled": true,
         "category": "",
         "content_extractor": null,
-        "profile": null
+        "profile": null,
+        "max_items": null,
+        "daily_rollup": false
       },
       {
         "name": "The Economist",
@@ -271,7 +337,9 @@
         "enabled": true,
         "category": "",
         "content_extractor": null,
-        "profile": null
+        "profile": null,
+        "max_items": null,
+        "daily_rollup": false
       },
       {
         "name": "Last Week in AI",
@@ -279,7 +347,9 @@
         "enabled": true,
         "category": "",
         "content_extractor": null,
-        "profile": null
+        "profile": null,
+        "max_items": null,
+        "daily_rollup": false
       },
       {
         "name": "Lilian Weng",
@@ -287,7 +357,9 @@
         "enabled": true,
         "category": "",
         "content_extractor": null,
-        "profile": null
+        "profile": null,
+        "max_items": null,
+        "daily_rollup": false
       },
       {
         "name": "Lobsters",
@@ -295,7 +367,9 @@
         "enabled": true,
         "category": "",
         "content_extractor": null,
-        "profile": null
+        "profile": null,
+        "max_items": null,
+        "daily_rollup": false
       },
       {
         "name": "The Pragmatic Engineer",
@@ -303,7 +377,9 @@
         "enabled": true,
         "category": "",
         "content_extractor": null,
-        "profile": null
+        "profile": null,
+        "max_items": null,
+        "daily_rollup": false
       },
       {
         "name": "AINews (Buttondown)",
@@ -311,7 +387,9 @@
         "enabled": true,
         "category": "",
         "content_extractor": null,
-        "profile": null
+        "profile": null,
+        "max_items": null,
+        "daily_rollup": false
       },
       {
         "name": "BBC Learning English",
@@ -319,7 +397,9 @@
         "enabled": true,
         "category": "",
         "content_extractor": null,
-        "profile": null
+        "profile": null,
+        "max_items": null,
+        "daily_rollup": false
       },
       {
         "name": "Anavem.com",
@@ -327,7 +407,9 @@
         "enabled": true,
         "category": "",
         "content_extractor": null,
-        "profile": null
+        "profile": null,
+        "max_items": null,
+        "daily_rollup": false
       },
       {
         "name": "GitHub Trending — All (daily)",
@@ -336,6 +418,7 @@
         "category": "github-trending",
         "content_extractor": null,
         "profile": "tech-news",
+        "max_items": null,
         "daily_rollup": true
       },
       {
@@ -345,6 +428,7 @@
         "category": "github-trending",
         "content_extractor": null,
         "profile": "tech-news",
+        "max_items": null,
         "daily_rollup": true
       },
       {
@@ -354,6 +438,7 @@
         "category": "github-trending",
         "content_extractor": null,
         "profile": "tech-news",
+        "max_items": null,
         "daily_rollup": true
       },
       {
@@ -363,7 +448,8 @@
         "category": "ai-research",
         "content_extractor": null,
         "profile": "tech-news",
-        "max_items": 15
+        "max_items": 15,
+        "daily_rollup": false
       },
       {
         "name": "arXiv cs.LG",
@@ -372,7 +458,8 @@
         "category": "ai-research",
         "content_extractor": null,
         "profile": "tech-news",
-        "max_items": 15
+        "max_items": 15,
+        "daily_rollup": false
       },
       {
         "name": "arXiv cs.CL",
@@ -381,7 +468,8 @@
         "category": "ai-research",
         "content_extractor": null,
         "profile": "tech-news",
-        "max_items": 15
+        "max_items": 15,
+        "daily_rollup": false
       }
     ],
     "reddit": {
@@ -611,8 +699,8 @@
     "imap_enabled": true,
     "smtp_server": "smtp.qq.com",
     "smtp_port": 465,
-    "smtp_username": "${HORIZON_EMAIL_ADDRESS}",
-    "email_address": "${HORIZON_EMAIL_ADDRESS}",
+    "smtp_username": null,
+    "email_address": "wenhangxx@foxmail.com",
     "password_env": "EMAIL_PASSWORD",
     "sender_name": "Horizon Daily",
     "subscribe_keyword": "SUBSCRIBE",

@@ -4,4 +4,6 @@ Use this profile for timely developments in software engineering, artificial int
 
 Typical items include substantial releases, research breakthroughs, security incidents, industry announcements, technical analyses tied to a recent event, and community discussions that add practical insight.
 
+**In-scope AI topics** (treat as core AI coverage, not peripheral): LLM, agents / agentic workflows, retrieval-augmented generation, ontology / knowledge graphs / schema design, vector databases, embeddings, fine-tuning, prompt engineering, inference optimization, and AI-adjacent data platforms (Databricks + AI, lakehouse + AI features, metadata catalogs powering AI pipelines).
+
 Do not use this profile for content whose primary value is a complete long-form argument, a step-by-step tutorial, a full academic paper, finance-first market coverage, routine updates, or promotional material without substantive information.

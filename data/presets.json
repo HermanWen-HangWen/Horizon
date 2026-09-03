@@ -4,7 +4,7 @@
       "id": "ai-ml",
       "name": "AI / Machine Learning",
       "name_zh": "人工智能 / 机器学习",
-      "keywords": ["ai", "ml", "llm", "大模型", "机器学习", "deep learning", "深度学习", "neural network", "gpt", "transformer", "diffusion", "生成式", "nlp", "自然语言处理", "computer vision", "计算机视觉"],
+      "keywords": ["ai", "ml", "llm", "大模型", "机器学习", "deep learning", "深度学习", "neural network", "gpt", "transformer", "diffusion", "生成式", "nlp", "自然语言处理", "computer vision", "计算机视觉", "agent", "ontology", "databricks", "metadata", "元数据"],
       "sources": [
         {
           "type": "reddit_subreddit",
