@@ -5,20 +5,30 @@ Usage:
     uv run python scripts/mobile-digest.py            # today
     uv run python scripts/mobile-digest.py --date 2026-09-02
     uv run python scripts/mobile-digest.py --no-fetch # don't auto-run horizon
+    uv run python scripts/mobile-digest.py --no-push  # write file only, skip nezha push
 
 Output:
     <output-dir>/每日AI科技简报 — YYYY-MM-DD.md
-    (default output-dir: parent of Horizon repo, i.e. /Users/wenhang/study/techradar/)
+    (default output-dir: <Horizon repo>/docs/_posts/, so the daily-summary
+    workflow's GitHub Pages publish step picks it up alongside the Horizon
+    summaries)
+
+Push:
+    After writing the digest, push it to the nezha-agenthome inbound API.
+    Requires env vars TECHNAR_TOKEN (X-Agent-Key) and TECHNAR_USERNAMES
+    (comma-separated recipients). Both missing -> push is skipped with a warning.
 """
 from __future__ import annotations
 
 import argparse
 import asyncio
+import os
 import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+import httpx
 from dotenv import load_dotenv
 
 # Resolve project paths so the script works from any cwd.
@@ -28,7 +38,7 @@ DATA_DIR = PROJECT_DIR / "data"
 SUMMARIES_DIR = DATA_DIR / "summaries"
 CONFIG_PATH = DATA_DIR / "config.json"
 TRENDING_PATH = DATA_DIR / "trending.json"
-DEFAULT_OUTPUT_DIR = PROJECT_DIR.parent  # /Users/wenhang/study/techradar
+DEFAULT_OUTPUT_DIR = PROJECT_DIR / "docs" / "_posts"
 
 # Load .env before importing horizon modules that read env vars at import time.
 load_dotenv(PROJECT_DIR / ".env")
@@ -113,6 +123,11 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--output-dir", default=str(DEFAULT_OUTPUT_DIR), help="Output directory")
     p.add_argument("--language", default="zh", choices=["zh", "en"], help="Summary language")
     p.add_argument("--max-lines", type=int, default=60, help="Target max lines for digest")
+    p.add_argument(
+        "--no-push",
+        action="store_true",
+        help="Write the digest file but skip the nezha-agenthome push",
+    )
     return p.parse_args()
 
 
@@ -200,6 +215,75 @@ async def generate_digest(client, raw: str, date: str, trending_block: str) -> s
     )
 
 
+def push_to_nezha(digest: str, date: str) -> None:
+    """Push the digest to the nezha-agenthome inbound API.
+
+    Reads TECHNAR_TOKEN (X-Agent-Key) and TECHNAR_USERNAMES (comma-separated)
+    from the environment. Either missing -> push is skipped with a warning;
+    failures are logged but do not raise, so the local digest file is
+    always produced regardless of push outcome.
+    """
+    token = os.getenv("TECHNAR_TOKEN")
+    usernames_raw = os.getenv("TECHNAR_USERNAMES", "")
+
+    if not token:
+        print("⚠️  TECHNAR_TOKEN not set; skipping nezha push", file=sys.stderr)
+        return
+    if not usernames_raw:
+        print("⚠️  TECHNAR_USERNAMES not set; skipping nezha push", file=sys.stderr)
+        return
+
+    usernames = [u.strip() for u in usernames_raw.split(",") if u.strip()]
+    if not usernames:
+        print("⚠️  TECHNAR_USERNAMES is empty; skipping nezha push", file=sys.stderr)
+        return
+
+    timestamp = datetime.now(timezone.utc).strftime("%H%M%S")
+    payload = {
+        "source_agent_id": "techradar",
+        "idempotency_key": f"msg-{date}-{timestamp}",
+        "routing": {
+            "type": "explicit",
+            "usernames": usernames,
+        },
+        "message": {
+            "parts": [
+                {
+                    "kind": "text",
+                    "text": digest,
+                }
+            ]
+        },
+    }
+
+    url = "https://nezha-agenthome.cn-pgcloud.com/api/a2a/inbound/push/async"
+    headers = {
+        "Content-Type": "application/json",
+        "X-Agent-Key": token,
+    }
+
+    try:
+        with httpx.Client(timeout=30.0) as client:
+            response = client.post(url, json=payload, headers=headers)
+            response.raise_for_status()
+            result = response.json()
+        delivered = result.get("success_count", "?")
+        total = result.get("total_count", "?")
+        print(
+            f"📤 Pushed to nezha: status={result.get('status')} "
+            f"request_id={result.get('request_id')} "
+            f"delivered={delivered}/{total}",
+            file=sys.stderr,
+        )
+    except httpx.HTTPStatusError as e:
+        print(
+            f"⚠️  Nezha push HTTP {e.response.status_code}: {e.response.text[:300]}",
+            file=sys.stderr,
+        )
+    except Exception as e:
+        print(f"⚠️  Nezha push failed: {type(e).__name__}: {e}", file=sys.stderr)
+
+
 def main() -> int:
     args = parse_args()
     date = args.date or datetime.now(timezone.utc).strftime("%Y-%m-%d")
@@ -242,6 +326,11 @@ def main() -> int:
     print(f"✅ Wrote {out_path} ({out_lines} lines)", file=sys.stderr)
     if out_lines > args.max_lines:
         print(f"⚠️  Output is {out_lines} lines, exceeds target {args.max_lines}", file=sys.stderr)
+
+    if args.no_push:
+        print("⏭️  --no-push set; skipping nezha push", file=sys.stderr)
+    else:
+        push_to_nezha(digest.strip(), date)
 
     return 0
 
