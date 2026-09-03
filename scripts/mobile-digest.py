@@ -52,10 +52,11 @@ SYSTEM_PROMPT = """\
 7. 末尾保留一段"⚠️ 数据可获得性"说明,简述哪些源正常/失败/数据空
 8. 链接紧跟在标题后,一行内展示;不要把链接单独成行占用屏幕
 
-9. **GitHub Trending 数据来自 user prompt 末尾的"Trending 真实数据"段**(Search API 查询结果)。
-   - 严格按照该段提供的 rank/full_name/language/total_stars/description 来写
-   - 不要编造"今日 +X"这种增量数字 —— 真实数据里**没有每日增量**,只能写总 star
-   - 选 Top 3(按数据里的 rank 顺序)
+9. **GitHub Trending 段:从 user prompt 末尾的"Trending 真实数据"段里,过滤出 AI 相关的 repo,选 Top 3**
+   - 过滤标准:描述/名称包含 LLM、agent、model、训练、推理、embedding、向量、prompt、RAG、Claude、GPT、Qwen、Llama、Mistral、diffusion 等 AI 关键词,或主语言是 Python 且与 AI 生态相关
+   - 排序:**按 stars_today 倒序**(用户想看"今天涨最快的 AI repo",不是总 star 最多的)
+   - 数据严格使用该段提供的 total_stars 和 stars_today
+   - 若过滤后少于 3 条 AI repo,有多少写多少,不要凑数
 
 输出格式(必须严格遵循):
 ```
