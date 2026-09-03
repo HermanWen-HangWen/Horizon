@@ -27,6 +27,7 @@ PROJECT_DIR = SCRIPT_DIR.parent
 DATA_DIR = PROJECT_DIR / "data"
 SUMMARIES_DIR = DATA_DIR / "summaries"
 CONFIG_PATH = DATA_DIR / "config.json"
+TRENDING_PATH = DATA_DIR / "trending.json"
 DEFAULT_OUTPUT_DIR = PROJECT_DIR.parent  # /Users/wenhang/study/techradar
 
 # Load .env before importing horizon modules that read env vars at import time.
@@ -50,6 +51,11 @@ SYSTEM_PROMPT = """\
 6. **完全删除**: 财经/政治/军事新闻、广告、PR 内容、模糊无来源的传闻
 7. 末尾保留一段"⚠️ 数据可获得性"说明,简述哪些源正常/失败/数据空
 8. 链接紧跟在标题后,一行内展示;不要把链接单独成行占用屏幕
+
+9. **GitHub Trending 数据来自 user prompt 末尾的"Trending 真实数据"段**(Search API 查询结果)。
+   - 严格按照该段提供的 rank/full_name/language/total_stars/description 来写
+   - 不要编造"今日 +X"这种增量数字 —— 真实数据里**没有每日增量**,只能写总 star
+   - 选 Top 3(按数据里的 rank 顺序)
 
 输出格式(必须严格遵循):
 ```
@@ -88,6 +94,8 @@ USER_PROMPT_TEMPLATE = """\
 ========== 原始简报开始 ==========
 {raw_content}
 ========== 原始简报结束 ==========
+
+{trending_block}
 
 请输出精简版(目标 ≤ 60 行)。\
 """
@@ -130,11 +138,58 @@ def load_ai_config() -> AIConfig:
     return AIConfig(**cfg["ai"])
 
 
-async def generate_digest(client, raw: str, date: str) -> str:
+def load_trending_block() -> str:
+    """Build the 'Trending 真实数据' block for the user prompt.
+
+    Auto-fetches via scripts/fetch_trending.py if data/trending.json is missing.
+    Returns an empty block string if the fetch fails or produces no data.
+    """
+    import json
+
+    if not TRENDING_PATH.exists():
+        print("📈 Trending data missing — running fetch_trending.py …", file=sys.stderr)
+        result = subprocess.run(
+            ["uv", "run", "python", str(SCRIPT_DIR / "fetch_trending.py")],
+            cwd=PROJECT_DIR,
+            check=False,
+        )
+        if result.returncode != 0 or not TRENDING_PATH.exists():
+            print("⚠️  Trending fetch failed; will skip the Trending section.", file=sys.stderr)
+            return ""
+
+    try:
+        payload = json.loads(TRENDING_PATH.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError) as exc:
+        print(f"⚠️  Trending JSON unreadable: {exc}", file=sys.stderr)
+        return ""
+
+    repos = payload.get("repos", [])
+    if not repos:
+        return ""
+
+    lines = ["========== Trending 真实数据 (GitHub Search API) =========="]
+    lines.append(
+        f"窗口:最近 {payload.get('window_days', '?')} 天 · 最低 star: {payload.get('min_stars', '?')} · 生成时间: {payload.get('generated_at', '?')}"
+    )
+    lines.append(
+        "每条格式:rank · full_name · primary_language · total_stars · description"
+    )
+    lines.append("")
+    for r in repos:
+        desc = (r.get("description") or "(无描述)").replace("\n", " ").strip()
+        lines.append(
+            f"#{r['rank']} [{r['language']}] {r['full_name']} | {r['primary_language']} | ⭐{r['total_stars']} | {desc} | {r['url']}"
+        )
+    lines.append("========== Trending 数据结束 ==========")
+    return "\n".join(lines)
+
+
+async def generate_digest(client, raw: str, date: str, trending_block: str) -> str:
     user_prompt = USER_PROMPT_TEMPLATE.format(
         date=date,
         raw_lines=raw.count("\n") + 1,
         raw_content=raw,
+        trending_block=trending_block or "(Trending 数据不可用,跳过 📊 GitHub Trending 段)",
     )
     return await client.complete(
         system=SYSTEM_PROMPT,
@@ -173,7 +228,8 @@ def main() -> int:
 
     print(f"🤖 Calling {ai_config.provider.value}/{ai_config.model} …", file=sys.stderr)
     client = _create_single_client(ai_config)
-    digest = asyncio.run(generate_digest(client, raw, date))
+    trending_block = load_trending_block()
+    digest = asyncio.run(generate_digest(client, raw, date, trending_block))
 
     out_dir = Path(args.output_dir).expanduser()
     out_dir.mkdir(parents=True, exist_ok=True)
