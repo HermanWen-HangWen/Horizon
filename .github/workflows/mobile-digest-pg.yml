@@ -10,7 +10,7 @@ on:
 
 jobs:
   mobile-digest:
-    runs-on: cloudgcitk8srunner
+    runs-on: ubuntu-latest
     permissions:
       contents: write  # Needed for the gh-pages deploy step
     env:
