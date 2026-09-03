@@ -154,29 +154,49 @@ def load_ai_config() -> AIConfig:
     return AIConfig(**cfg["ai"])
 
 
+def _trending_json_broken() -> bool:
+    """Return True if trending.json exists but can't be parsed as JSON."""
+    import json
+    try:
+        json.loads(TRENDING_PATH.read_text(encoding="utf-8"))
+        return False
+    except (json.JSONDecodeError, OSError):
+        return True
+
+
 def load_trending_block() -> str:
     """Build the 'Trending 真实数据' block for the user prompt.
 
-    Auto-fetches via scripts/fetch_trending.py if data/trending.json is missing.
-    Returns an empty block string if the fetch fails or produces no data.
+    Auto-fetches via scripts/fetch_trending.py if data/trending.json is missing
+    or unreadable (e.g. 0-byte file from a prior crashed run). Returns an empty
+    block string if the fetch fails or produces no data.
     """
     import json
 
-    if not TRENDING_PATH.exists():
-        print("📈 Trending data missing — running fetch_trending.py …", file=sys.stderr)
+    needs_fetch = (
+        not TRENDING_PATH.exists()
+        or TRENDING_PATH.stat().st_size == 0
+        or _trending_json_broken()
+    )
+    if needs_fetch:
+        print(
+            f"[Github Trending] 📈 Trending data missing/empty/broken ({TRENDING_PATH}) — "
+            "running fetch_trending.py …",
+            file=sys.stderr,
+        )
         result = subprocess.run(
             ["uv", "run", "python", str(SCRIPT_DIR / "fetch_trending.py")],
             cwd=PROJECT_DIR,
             check=False,
         )
         if result.returncode != 0 or not TRENDING_PATH.exists():
-            print("⚠️  Trending fetch failed; will skip the Trending section.", file=sys.stderr)
+            print("[Github Trending] ⚠️  Trending fetch failed; will skip the Trending section.", file=sys.stderr)
             return ""
 
     try:
         payload = json.loads(TRENDING_PATH.read_text(encoding="utf-8"))
     except (json.JSONDecodeError, OSError) as exc:
-        print(f"⚠️  Trending JSON unreadable: {exc}", file=sys.stderr)
+        print(f"[Github Trending] ⚠️  Trending JSON unreadable after refetch: {exc}", file=sys.stderr)
         return ""
 
     repos = payload.get("repos", [])
