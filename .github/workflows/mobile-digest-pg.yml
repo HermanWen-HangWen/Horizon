@@ -10,7 +10,7 @@ on:
 
 jobs:
   mobile-digest:
-    runs-on: ${{ vars.RUNNER || 'ubuntu-latest' }}
+runs-on: ${{ vars.RUNNER || 'ubuntu-latest' }}
     permissions:
       contents: write  # Needed for the gh-pages deploy step
     env:
