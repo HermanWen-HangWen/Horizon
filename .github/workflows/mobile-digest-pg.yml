@@ -1,0 +1,61 @@
+name: Mobile Digest Push
+
+on:
+  schedule:
+    # 30 min after daily-summary (which runs at 23:00 UTC) so today's
+    # summary file exists for mobile-digest.py to consume.
+    # GitHub scheduled workflows use UTC.
+    - cron: '30 23 * * *'
+  workflow_dispatch:      # Allow manual trigger
+
+jobs:
+  mobile-digest:
+    runs-on: cloudgcitk8srunner
+    permissions:
+      contents: write  # Needed for the gh-pages deploy step
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.11.26"
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Prepare GitHub Actions config
+        run: cp data/config.github.json data/config.json
+
+      - name: Run mobile-digest.py
+        env:
+          # Mobile-digest.py loads .env for AI client; supply the same
+          # provider key daily-summary uses so the digest LLM call works.
+          MINIMAX_API_KEY: ${{ secrets.MINIMAX_API_KEY }}
+          # Used by push_to_nezha() to authenticate the API call.
+          TECHNAR_TOKEN: ${{ secrets.TECHNAR_TOKEN }}
+          # Comma-separated explicit recipients for the routed message.
+          TECHNAR_USERNAMES: ${{ secrets.TECHNAR_USERNAMES }}
+        run: uv run python scripts/mobile-digest.py
+
+      - name: Set current date as environment variable
+        run: echo "DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs
+          keep_files: true  # Keep existing summaries on gh-pages branch
+          commit_message: "📱 Mobile Digest: ${{ env.DATE }}"
+          publish_branch: gh-pages
+          enable_jekyll: true
