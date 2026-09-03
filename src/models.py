@@ -260,6 +260,9 @@ class RSSSourceConfig(BaseModel):
     category: Optional[str] = None
     content_extractor: Optional[str] = None
     profile: ProfileRoute = None
+    max_items: Optional[int] = None  # Cap per-feed item count (feeds without
+                                     # time-windowed publishing — e.g. arXiv —
+                                     # otherwise flood the pipeline)
     daily_rollup: bool = False  # If true, fall back to channel-level pubDate
                                 # when items lack their own (e.g. mshibanami/
                                 # GitHubTrendingRSS). Off by default to avoid

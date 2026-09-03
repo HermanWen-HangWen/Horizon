@@ -95,6 +95,12 @@ class RSSScraper(BaseScraper):
                 if not published_at or published_at < since:
                     continue
 
+                # Optional per-source cap. Some feeds (e.g. arXiv RSS) publish
+                # a large backlog of items all dated the same day; without a
+                # cap they flood the pipeline.
+                if source.max_items is not None and len(items) >= source.max_items:
+                    break
+
                 # Generate unique ID from feed URL and entry ID
                 feed_id = str(source.url).split("//")[1].replace("/", "_")
                 entry_id = entry.get("id", entry.get("link", ""))
