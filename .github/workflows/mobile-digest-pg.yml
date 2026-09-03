@@ -45,7 +45,7 @@ jobs:
           TECHNAR_TOKEN: ${{ secrets.TECHNAR_TOKEN }}
           # Comma-separated explicit recipients for the routed message.
           TECHNAR_USERNAMES: ${{ secrets.TECHNAR_USERNAMES }}
-        run: uv run python scripts/mobile-digest.py
+        run: uv run mobile-digest
 
       - name: Set current date as environment variable
         run: echo "DATE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV

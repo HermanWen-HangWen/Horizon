@@ -2,10 +2,10 @@
 """Generate a mobile-friendly daily digest from Horizon's raw summary.
 
 Usage:
-    uv run python scripts/mobile-digest.py            # today
-    uv run python scripts/mobile-digest.py --date 2026-09-02
-    uv run python scripts/mobile-digest.py --no-fetch # don't auto-run horizon
-    uv run python scripts/mobile-digest.py --no-push  # write file only, skip nezha push
+    uv run mobile-digest            # today
+    uv run mobile-digest --date 2026-09-02
+    uv run mobile-digest --no-fetch # don't auto-run horizon
+    uv run mobile-digest --no-push  # write file only, skip nezha push
 
 Output:
     <output-dir>/每日AI科技简报 — YYYY-MM-DD.md
